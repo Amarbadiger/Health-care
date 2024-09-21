@@ -3,10 +3,12 @@ import { Form, Input, Button, InputNumber } from "antd";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../config/firebaseconfig";
 import { useNavigate } from "react-router-dom";
+
 const Addservice = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
@@ -44,6 +46,10 @@ const Addservice = () => {
               required: true,
               message: "Please input the name of the service!",
             },
+            {
+              min: 2,
+              message: "Service name must be at least 2 characters long!",
+            },
           ]}
         >
           <Input placeholder="Enter service name" />
@@ -75,12 +81,24 @@ const Addservice = () => {
               min: 0,
               message: "Price must be at least 0!",
             },
+            {
+              validator: (_, value) => {
+                if (value === undefined || value === null) {
+                  return Promise.reject(new Error("Price is required!"));
+                }
+                if (isNaN(value)) {
+                  return Promise.reject(new Error("Price must be a number!"));
+                }
+                return Promise.resolve();
+              },
+            },
           ]}
         >
           <InputNumber
             placeholder="Enter price"
             min={0}
             style={{ width: "100%" }}
+            step={0.01}
           />
         </Form.Item>
 
